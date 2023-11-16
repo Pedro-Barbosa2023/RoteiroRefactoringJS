@@ -64,6 +64,7 @@ function calcularTotalFatura(pecas, apresentacoes) {
   return totalFatura;
 }
 
+// Função para gerar fatura em formato de string
 function gerarFaturaStr(fatura, pecas) {
   let faturaStr = `Fatura ${fatura.cliente}\n`;
   for (let apre of fatura.apresentacoes) {
@@ -74,7 +75,30 @@ function gerarFaturaStr(fatura, pecas) {
   return faturaStr;
 }
 
+// Função para gerar fatura em formato HTML
+function gerarFaturaHTML(fatura, pecas) {
+  let faturaHTML = `<html>\n<p> Fatura ${fatura.cliente} </p>\n<ul>\n`;
+
+  for (let apre of fatura.apresentacoes) {
+    const peca = getPeca(pecas, apre);
+    const total = calcularTotalApresentacao(pecas, apre);
+    faturaHTML += `<li>  ${peca.nome}: ${formatarMoeda(total)} (${apre.audiencia} assentos) </li>\n`;
+  }
+
+  const totalFatura = calcularTotalFatura(pecas, fatura.apresentacoes);
+  const totalCreditos = calcularTotalCreditos(pecas, fatura.apresentacoes);
+
+  faturaHTML += `</ul>\n<p> Valor total: ${formatarMoeda(totalFatura)} </p>\n<p> Créditos acumulados: ${totalCreditos} </p>\n</html>`;
+  return faturaHTML;
+}
+
 const faturas = JSON.parse(readFileSync('./faturas.json'));
 const pecas = JSON.parse(readFileSync('./pecas.json'));
+
+// Gerar e exibir fatura em formato de string
 const faturaStr = gerarFaturaStr(faturas, pecas);
-console.log(faturaStr);
+console.log("Fatura em String:\n", faturaStr);
+
+// Gerar e exibir fatura em formato HTML
+const faturaHTML = gerarFaturaHTML(faturas, pecas);
+console.log("\nFatura em HTML:\n", faturaHTML);
